@@ -1,0 +1,68 @@
+site_name: post-gwas-causal
+site_description: Post-GWAS causal-mechanism toolkit — fine-mapping, colocalization, Mendelian randomization, TWAS, and polygenic risk scoring on summary statistics.
+site_url: https://abayatibrain.github.io/post-gwas-causal/
+repo_url: https://github.com/abayatibrain/post-gwas-causal
+repo_name: abayatibrain/post-gwas-causal
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - content.code.copy
+    - content.code.annotate
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: deep orange
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: deep orange
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            show_source: false
+            docstring_style: numpy
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - toc:
+      permalink: true
+
+extra_javascript:
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+nav:
+  - Home: index.md
+  - Biology primer: biology.md
+  - Methods: methods.md
+  - Architecture: architecture.md
+  - Decision log:
+      - adrs/index.md
+      - ADR-0001: adrs/0001.md
+      - ADR-0002: adrs/0002.md
+      - ADR-0003: adrs/0003.md

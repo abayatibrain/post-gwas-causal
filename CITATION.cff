@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "post-gwas-causal"
+abstract: "Post-GWAS causal-mechanism toolkit — fine-mapping, colocalization, Mendelian randomization, TWAS, and polygenic risk scoring on summary statistics."
+authors:
+  - family-names: "Bayati"
+    given-names: "Armin"
+    email: "a.bayati.brain@gmail.com"
+    orcid: "https://orcid.org/0000-0000-0000-0000"
+repository-code: "https://github.com/abayatibrain/post-gwas-causal"
+url: "https://github.com/abayatibrain/post-gwas-causal"
+license: MIT
+version: "0.1.0"
+date-released: "2026-06-17"
+keywords:
+  - bioinformatics
+  - statistical-genetics
+  - gwas
+  - fine-mapping
+  - mendelian-randomization

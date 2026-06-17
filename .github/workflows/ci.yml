@@ -1,0 +1,54 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-type-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+          enable-cache: true
+      - name: Set up Python
+        run: uv python install 3.11
+      - name: Sync deps
+        run: uv sync --all-extras --dev
+      - name: Ruff lint
+        run: uv run ruff check src tests
+      - name: Ruff format check
+        run: uv run ruff format --check src tests
+      - name: Mypy
+        run: |
+          uv run mypy \
+            src/post_gwas_causal/simulate.py \
+            src/post_gwas_causal/finemap/abf.py \
+            src/post_gwas_causal/finemap/susie.py \
+            src/post_gwas_causal/coloc/abf.py \
+            src/post_gwas_causal/mr/ivw.py \
+            src/post_gwas_causal/mr/egger.py \
+            src/post_gwas_causal/mr/weighted_median.py \
+            src/post_gwas_causal/mr/heterogeneity.py \
+            src/post_gwas_causal/mr/harmonize.py \
+            src/post_gwas_causal/twas/burden.py \
+            src/post_gwas_causal/prs/clump_threshold.py \
+            src/post_gwas_causal/prs/shrinkage.py \
+            src/post_gwas_causal/prs/evaluate.py \
+            src/post_gwas_causal/rbridge.py \
+            src/post_gwas_causal/cli.py
+      - name: Pytest
+        run: |
+          uv run pytest \
+            --cov=post_gwas_causal \
+            --cov-report=xml \
+            --cov-fail-under=70
+      - name: Upload coverage
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+        if: ${{ env.CODECOV_TOKEN != '' }}

@@ -1,0 +1,94 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual envs
+.venv/
+venv/
+ENV/
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+
+# Type / lint caches
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.pytype/
+
+# Notebooks
+.ipynb_checkpoints/
+*.ipynb_meta
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docs
+site/
+
+# Data — never commit summary-statistics dumps or reference panels
+*.h5
+*.parquet
+*.bgen
+*.bed
+*.bim
+*.fam
+*.vcf
+*.vcf.gz
+data/raw/
+data/processed/
+data/cache/
+!data/README.md
+!data/.gitkeep
+
+# Large delimited files — keep small fixtures only
+*.tsv
+!tests/fixtures/**/*.tsv
+
+# Results artifacts (keep the directory, not its contents)
+results/*
+!results/.gitkeep
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Editor / sed-backup leftovers
+*.bak
