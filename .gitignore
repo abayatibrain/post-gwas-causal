@@ -92,3 +92,6 @@ results/*
 
 # Editor / sed-backup leftovers
 *.bak
+
+# Sync-locked leftover from git init on a restricted mount (cannot be deleted)
+.git_broken_*/
