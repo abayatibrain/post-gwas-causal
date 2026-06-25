@@ -81,6 +81,7 @@ uv run post-gwas-causal prs
 | `finemap.abf` | Wakefield approximate Bayes factors, PIPs, credible sets | Wakefield 2009 |
 | `finemap.susie` | SuSiE-RSS (sum of single effects, IBSS) | Wang 2020; Zou 2022 |
 | `coloc.abf` | Bayesian colocalization (PP.H0–H4) | Giambartolomei 2014 |
+| `coloc.susie` | SuSiE-based colocalization (multiple causal variants, per-credible-set PP.H4) | Wallace 2021 |
 | `mr.ivw` | Inverse-variance-weighted MR (fixed + random) | Burgess 2013 |
 | `mr.egger` | MR-Egger slope + pleiotropy intercept | Bowden 2015 |
 | `mr.weighted_median` | Weighted-median MR (robust) | Bowden 2016 |

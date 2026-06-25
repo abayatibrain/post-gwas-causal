@@ -20,6 +20,7 @@ from rich.table import Table
 
 from post_gwas_causal import __version__
 from post_gwas_causal.coloc.abf import coloc_abf
+from post_gwas_causal.coloc.susie import coloc_susie
 from post_gwas_causal.finemap.abf import finemap_abf
 from post_gwas_causal.finemap.susie import finemap_susie
 from post_gwas_causal.mr.egger import mr_egger
@@ -121,6 +122,38 @@ def coloc(
     table.add_column("Posterior")
     for name, value in res.as_dict().items():
         table.add_row(name, f"{value:.4f}")
+    console.print(table)
+
+
+@app.command(name="coloc-susie")
+def coloc_susie_cmd(
+    shared: bool = typer.Option(True, help="Simulate a shared causal variant (H4)."),
+    seed: int = typer.Option(0, help="RNG seed."),
+) -> None:
+    """Run SuSiE-based colocalization (multi-causal) and print the top pairs."""
+    data = simulate_coloc(ColocConfig(shared_causal=shared, seed=seed))
+    res = coloc_susie(
+        data.trait1.z_arr,
+        data.trait2.z_arr,
+        data.ld_arr,
+        data.trait1.n,
+        data.trait2.n,
+    )
+    console.print(
+        f"SuSiE found {res.n_cs1} credible set(s) for trait 1 and "
+        f"{res.n_cs2} for trait 2; best PP.H4 = {res.best_pp_h4:.4f}"
+    )
+    table = Table(title="coloc-SuSiE: credible-set pairs")
+    table.add_column("CS1")
+    table.add_column("CS2")
+    table.add_column("PP.H4", justify="right")
+    table.add_column("PP.H3", justify="right")
+    table.add_column("Best SNP", justify="right")
+    for pair in res.pairs[:10]:
+        table.add_row(
+            str(pair.idx1), str(pair.idx2), f"{pair.pp_h4:.4f}",
+            f"{pair.pp_h3:.4f}", str(pair.best_snp),
+        )
     console.print(table)
 
 

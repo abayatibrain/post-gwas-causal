@@ -37,7 +37,7 @@ from scipy.special import logsumexp
 
 from post_gwas_causal.finemap.abf import log_abf
 
-__all__ = ["ColocResult", "coloc_abf"]
+__all__ = ["ColocResult", "coloc_abf", "coloc_from_logbf"]
 
 
 class ColocResult(BaseModel):
@@ -133,6 +133,41 @@ def coloc_abf(
 
     l1 = log_abf(beta1, se1, prior_variance1)
     l2 = log_abf(beta2, se2, prior_variance2)
+    return coloc_from_logbf(l1, l2, p1=p1, p2=p2, p12=p12)
+
+
+def coloc_from_logbf(
+    l1: np.ndarray,
+    l2: np.ndarray,
+    *,
+    p1: float = 1e-4,
+    p2: float = 1e-4,
+    p12: float = 1e-5,
+) -> ColocResult:
+    r"""Combine two per-SNP log-Bayes-factor vectors into coloc posteriors.
+
+    This is the hypothesis-combination core shared by :func:`coloc_abf` (which
+    derives ``l1``/``l2`` from Wakefield ABFs on ``beta``/``se``) and
+    SuSiE-based colocalization (:func:`post_gwas_causal.coloc.susie.coloc_susie`,
+    which passes the per-single-effect log Bayes factors). Keeping it separate
+    means the five-hypothesis arithmetic lives in exactly one place.
+
+    Parameters
+    ----------
+    l1, l2
+        SNP-aligned per-SNP log Bayes factors for the two signals.
+    p1, p2, p12
+        Coloc priors (see :func:`coloc_abf`).
+
+    Returns
+    -------
+    ColocResult
+        Posterior probabilities PP.H0..PP.H4.
+    """
+    l1 = np.asarray(l1, dtype=float)
+    l2 = np.asarray(l2, dtype=float)
+    if l1.shape != l2.shape:
+        raise ValueError("l1 and l2 must share the same shape")
 
     log_p1 = np.log(p1)
     log_p2 = np.log(p2)
@@ -169,7 +204,7 @@ def coloc_abf(
         pp_h2=float(pp[2]),
         pp_h3=float(pp[3]),
         pp_h4=float(pp[4]),
-        n_snps=int(beta1.shape[0]),
+        n_snps=int(l1.shape[0]),
         priors=(p1, p2, p12),
         best_snp_h4=int(np.argmax(l1 + l2)),
     )

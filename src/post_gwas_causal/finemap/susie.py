@@ -62,11 +62,18 @@ class SusieResult(BaseModel):
     credible_sets: list[list[int]]
     n_iter: int
     converged: bool
+    lbf: list[list[float]] = []
+    cs_effects: list[int] = []
 
     @property
     def pip_arr(self) -> np.ndarray:
         """Posterior inclusion probabilities as a NumPy array."""
         return np.asarray(self.pip, dtype=float)
+
+    @property
+    def lbf_arr(self) -> np.ndarray:
+        """Per-single-effect log Bayes factors as an ``L x p`` array."""
+        return np.asarray(self.lbf, dtype=float)
 
 
 def _single_effect_posterior(
@@ -74,7 +81,7 @@ def _single_effect_posterior(
     n: int,
     prior_variance: float,
     residual_variance: float,
-) -> tuple[np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     r"""Posterior for one single effect given a residualized association vector.
 
     ``xtr`` plays the role of ``X' r`` (the inner product between each
@@ -96,8 +103,9 @@ def _single_effect_posterior(
     Returns
     -------
     tuple
-        ``(alpha, post_mean)`` — the categorical posterior over SNPs and the
-        posterior mean effect *conditional on* each SNP being the causal one.
+        ``(alpha, post_mean, log_bf)`` — the categorical posterior over SNPs,
+        the posterior mean effect *conditional on* each SNP being the causal
+        one, and the per-SNP log Bayes factor (Wakefield form).
     """
     shat2 = residual_variance / n  # variance of each univariate estimate
     bhat = xtr / n
@@ -114,7 +122,7 @@ def _single_effect_posterior(
     m = np.max(log_bf)
     w = np.exp(log_bf - m)
     alpha = w / w.sum()
-    return alpha, post_mean
+    return alpha, post_mean, log_bf
 
 
 def _purity(cs: list[int], abs_r: np.ndarray) -> float:
@@ -190,6 +198,7 @@ def finemap_susie(
     alpha = np.zeros((n_effects, p))
     mu = np.zeros((n_effects, p))  # posterior mean conditional on each SNP
     b = np.zeros((n_effects, p))  # expected effect = alpha * mu per effect
+    lbf = np.zeros((n_effects, p))  # per-effect log Bayes factors (last sweep)
 
     converged = False
     n_iter = 0
@@ -201,11 +210,14 @@ def finemap_susie(
             b_other = b.sum(axis=0) - b[eff]
             # Residual inner product X'(y - X b_other) = X'y - (X'X) b_other.
             xtr = xty - n * (ld @ b_other)
-            new_alpha, new_mu = _single_effect_posterior(xtr, n, prior_variance, residual_variance)
+            new_alpha, new_mu, new_lbf = _single_effect_posterior(
+                xtr, n, prior_variance, residual_variance
+            )
             max_change = max(max_change, float(np.max(np.abs(new_alpha - alpha[eff]))))
             alpha[eff] = new_alpha
             mu[eff] = new_mu
             b[eff] = new_alpha * new_mu
+            lbf[eff] = new_lbf
         if max_change < tol:
             converged = True
             break
@@ -214,6 +226,7 @@ def finemap_susie(
 
     abs_r = np.abs(ld)
     credible_sets: list[list[int]] = []
+    cs_effects: list[int] = []
     for eff in range(n_effects):
         order = np.argsort(alpha[eff])[::-1]
         cumulative = np.cumsum(alpha[eff][order])
@@ -225,6 +238,7 @@ def finemap_susie(
             continue
         if _purity(cs, abs_r) >= min_purity:
             credible_sets.append(cs)
+            cs_effects.append(eff)
 
     return SusieResult(
         pip=pip.tolist(),
@@ -232,4 +246,6 @@ def finemap_susie(
         credible_sets=credible_sets,
         n_iter=n_iter,
         converged=converged,
+        lbf=lbf.tolist(),
+        cs_effects=cs_effects,
     )
