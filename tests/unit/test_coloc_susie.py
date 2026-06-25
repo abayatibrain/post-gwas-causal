@@ -26,8 +26,14 @@ def test_shared_single_signal_matches_coloc_abf() -> None:
     """On a one-causal-variant shared locus, coloc-SuSiE agrees with coloc.abf."""
     d = simulate_coloc(
         ColocConfig(
-            n_snps=60, n_samples=30000, rho=0.6, shared_causal=True,
-            causal_idx_1=25, effect_1=0.12, effect_2=0.12, seed=1,
+            n_snps=60,
+            n_samples=30000,
+            rho=0.6,
+            shared_causal=True,
+            causal_idx_1=25,
+            effect_1=0.12,
+            effect_2=0.12,
+            seed=1,
         )
     )
     cs = coloc_susie(d.trait1.z_arr, d.trait2.z_arr, d.ld_arr, d.trait1.n, d.trait2.n)
@@ -41,8 +47,15 @@ def test_distinct_single_signal_low_pp_h4() -> None:
     """Distinct causal variants give low colocalization probability."""
     d = simulate_coloc(
         ColocConfig(
-            n_snps=60, n_samples=40000, rho=0.4, shared_causal=False,
-            causal_idx_1=10, causal_idx_2=45, effect_1=0.18, effect_2=0.18, seed=6,
+            n_snps=60,
+            n_samples=40000,
+            rho=0.4,
+            shared_causal=False,
+            causal_idx_1=10,
+            causal_idx_2=45,
+            effect_1=0.18,
+            effect_2=0.18,
+            seed=6,
         )
     )
     cs = coloc_susie(d.trait1.z_arr, d.trait2.z_arr, d.ld_arr, d.trait1.n, d.trait2.n)

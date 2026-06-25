@@ -151,8 +151,11 @@ def coloc_susie_cmd(
     table.add_column("Best SNP", justify="right")
     for pair in res.pairs[:10]:
         table.add_row(
-            str(pair.idx1), str(pair.idx2), f"{pair.pp_h4:.4f}",
-            f"{pair.pp_h3:.4f}", str(pair.best_snp),
+            str(pair.idx1),
+            str(pair.idx2),
+            f"{pair.pp_h4:.4f}",
+            f"{pair.pp_h3:.4f}",
+            str(pair.best_snp),
         )
     console.print(table)
 
